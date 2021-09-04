@@ -74,12 +74,12 @@ __global__ void matmul(unsigned* g_C, const unsigned* g_A, const unsigned* g_B, 
 	unsigned sum = 0;
 	printf("%d번째 g_C를 구하는 과정입니다\n", gy * width + gx);
 	for (int m = 0; m < TILE_WIDTH; m++) {//TILE_WIDTH = blockDim.y(g_A의 경우)= blockDim.x(g_B의 경우)
-		printf("g_A[%4d]*g_B[%4d] = %u * %u = %u더하고\n", gy*width+(m*TILE_WIDTH+tx), (m*TILE_WIDTH+ty)*width+gx, g_A[gy*width+(m*TILE_WIDTH+tx)]*g_B[(m*TILE_WIDTH+ty)*width+gx], g_A[gy * width + (m * TILE_WIDTH + tx)], g_B[(m * TILE_WIDTH + ty) * width + gx]);
-		sum += g_A[gy * width + (m * TILE_WIDTH + tx)]*g_B[(m*TILE_WIDTH+ty)*width+gx];
+		printf("g_A[%4d]*g_B[%4d] = %u * %u = %u더하고\n", gy * width + (m * TILE_WIDTH + tx), (m * TILE_WIDTH + ty) * width + gx, g_A[gy * width + (m * TILE_WIDTH + tx)] , g_B[(m * TILE_WIDTH + ty) * width + gx], g_A[gy * width + (m * TILE_WIDTH + tx)]* g_B[(m * TILE_WIDTH + ty) * width + gx]);
+		sum += g_A[gy * width + (m * TILE_WIDTH + tx)] * g_B[(m * TILE_WIDTH + ty) * width + gx];
 
 	}
 	g_C[gy * width + gx] = sum;
-	printf("결과는 g_C[% 4d][% 4d] = % u\n", gy,gx,g_C[gy*width+gx]);
+	printf("결과는 g_C[% 4d][% 4d] = % u\n", gy, gx, g_C[gy * width + gx]);
 }
 int main(void)
 {
@@ -123,11 +123,11 @@ int main(void)
 	(cudaMalloc((void**)&pCDev, TOTALSIZE * sizeof(unsigned)));
 	CUDA_CHECK();
 
-	(cudaMemset(pADev, 0, TOTALSIZE*sizeof(unsigned)));
+	(cudaMemset(pADev, 0, TOTALSIZE * sizeof(unsigned)));
 	CUDA_CHECK();
-	(cudaMemset(pBDev, 0, TOTALSIZE*sizeof(unsigned)));
+	(cudaMemset(pBDev, 0, TOTALSIZE * sizeof(unsigned)));
 	CUDA_CHECK();
-	(cudaMemset(pCDev, 0, TOTALSIZE*sizeof(unsigned)));
+	(cudaMemset(pCDev, 0, TOTALSIZE * sizeof(unsigned)));
 	CUDA_CHECK();
 
 	cudaMemcpy(pADev, pA, sizeof(unsigned) * TOTALSIZE, cudaMemcpyHostToDevice);
@@ -137,9 +137,9 @@ int main(void)
 
 	QueryPerformanceCounter((LARGE_INTEGER*)(&cntStart));
 
-	dim3 gridDim(WIDTH/TILE_WIDTH,WIDTH/TILE_WIDTH, 1);
+	dim3 gridDim(WIDTH / TILE_WIDTH, WIDTH / TILE_WIDTH, 1);
 	dim3 blockDim(TILE_WIDTH, TILE_WIDTH, 1);
-	matmul<<<gridDim,blockDim>>>(pCDev, pADev, pBDev, WIDTH);
+	matmul << <gridDim, blockDim >> > (pCDev, pADev, pBDev, WIDTH);
 	QueryPerformanceCounter((LARGE_INTEGER*)(&cntEnd));
 	(cudaPeekAtLastError());
 	CUDA_CHECK();
