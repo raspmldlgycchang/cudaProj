@@ -77,7 +77,7 @@ __global__ void sharedmatmul(unsigned* g_C, const unsigned* g_A, const unsigned*
 	for (int m = 0; m < WIDTH / TILE_WIDTH; m++) {//width/TILE_WIDTH = gridDim.x(g_A의 경우)= gridDim.y(g_B의 경우)
 		s_A[ty][tx] = g_A[gy * width + (m * TILE_WIDTH + tx)];
 		s_B[ty][tx] = g_B[(m * TILE_WIDTH + tx) * width + gx];
-		for (int k = 0; k<width; k++) {
+		for (int k = 0; k<TILE_WIDTH; k++) {
 			sum += s_A[ty][k] * s_B[k][tx];
 		}
 	}
